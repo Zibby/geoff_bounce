@@ -1,4 +1,4 @@
-# Install:
+# Install
 
 git clone
 
@@ -11,6 +11,7 @@ go get -v github.com/veandco/go-sdl2/img
 go get -v github.com/veandco/go-sdl2/mix
 go get -v github.com/veandco/go-sdl2/ttf
 go get -v github.com/veandco/go-sdl2/gfx
+go build .
 ```
 ## On osx
 
@@ -22,4 +23,6 @@ go get -v github.com/veandco/go-sdl2/img
 go get -v github.com/veandco/go-sdl2/mix
 go get -v github.com/veandco/go-sdl2/ttf
 go get -v github.com/veandco/go-sdl2/gfx
+go build .
 ```
+
