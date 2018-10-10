@@ -1,63 +1,64 @@
 package main
 
-import(
-  "fmt"
-  "os"
-  "runtime"
-  "time"
-  "github.com/veandco/go-sdl2/sdl"
-  ttf "github.com/veandco/go-sdl2/ttf"
+import (
+	"fmt"
+	"os"
+	"runtime"
+	"time"
+
+	"github.com/veandco/go-sdl2/sdl"
+	ttf "github.com/veandco/go-sdl2/ttf"
 )
 
-func main()  {
-  if err := run(); err != nil {
-    fmt.Fprintf(os.Stderr, "%v", err)
-    os.Exit(2)
-  }
+func main() {
+	if err := run(); err != nil {
+		fmt.Fprintf(os.Stderr, "%v", err)
+		os.Exit(2)
+	}
 }
 
-func run()  error{
-  err := sdl.Init(sdl.INIT_EVERYTHING)
-  if err != nil {
-    return fmt.Errorf("could not init SDL: %v", err)
-  }
-  defer sdl.Quit()
+func run() error {
+	err := sdl.Init(sdl.INIT_EVERYTHING)
+	if err != nil {
+		return fmt.Errorf("could not init SDL: %v", err)
+	}
+	defer sdl.Quit()
 
-  if err := ttf.Init(); err != nil {
-    return fmt.Errorf("could not init TTF: %v", err)
-  }
+	if err := ttf.Init(); err != nil {
+		return fmt.Errorf("could not init TTF: %v", err)
+	}
 
-  w, r, err := sdl.CreateWindowAndRenderer(800, 600, sdl.WINDOW_SHOWN)
-  if err != nil {
-    return fmt.Errorf("could not create window %v", err)
-  }
-  defer w.Destroy()
-  _ = r
+	w, r, err := sdl.CreateWindowAndRenderer(800, 600, sdl.WINDOW_SHOWN)
+	if err != nil {
+		return fmt.Errorf("could not create window %v", err)
+	}
+	defer w.Destroy()
+	_ = r
 
-  if err := drawTitle(r, "Geoff Bounce"); err != nil {
-    return fmt.Errorf("Could not draw title: %v", err)
-  }
+	if err := drawTitle(r, "Geoff Bounce", false); err != nil {
+		return fmt.Errorf("Could not draw title: %v", err)
+	}
 
-  s, err := newScene(r)
-  if err != nil {
-    return fmt.Errorf("Could not create scene: %v", err)
-  }
-  defer s.destroy()
+	s, err := newScene(r)
+	if err != nil {
+		return fmt.Errorf("Could not create scene: %v", err)
+	}
+	defer s.destroy()
 
-  events := make(chan sdl.Event)
-  errc := s.run(events, r)
+	events := make(chan sdl.Event)
+	errc := s.run(events, r)
 
-  runtime.LockOSThread()
-  for {
-    select {
-    case events <- sdl.WaitEvent():
-    case err:= <-errc:
-      return err
-    }
-  }
+	runtime.LockOSThread()
+	for {
+		select {
+		case events <- sdl.WaitEvent():
+		case err := <-errc:
+			return err
+		}
+	}
 }
 
-func drawTitle(r *sdl.Renderer, text string) error {
+func drawTitle(r *sdl.Renderer, text string, dead bool) error {
 	r.Clear()
 
 	f, err := ttf.OpenFont("res/fonts/joystix.ttf", 20)
@@ -84,8 +85,10 @@ func drawTitle(r *sdl.Renderer, text string) error {
 	}
 
 	r.Present()
-  time.Sleep(4 * time.Second)
 
-
+	time.Sleep(4 * time.Second)
+	if dead {
+		return fmt.Errorf("Thats all folks")
+	}
 	return nil
 }
